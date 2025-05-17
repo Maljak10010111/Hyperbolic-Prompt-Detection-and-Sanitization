@@ -7,13 +7,13 @@ import pandas as pd
 load_dotenv()
 
 class I2P:
-    def __init__(self, dataset_name, split, ):
+    def __init__(self,  split, ):
         data = load_dataset("AIML-TUDA/i2p",
             cache_dir = os.getenv('TORCH_HOME')
         )
         self.data = data
-        self.dataset_name = dataset_name
         self.split = split
+        self.name = 'i2p'
     def __len__(self):
         return len(self.data)
     
@@ -24,33 +24,31 @@ class I2P:
     
 if __name__ == "__main__":
     dataset = I2P('i2p', 'train')
-    # print(len(dataset))
-    # ds = dataset.data
-    # # 1. Basic Info
-    # print("Dataset Structure:")
-    # print(ds)
+    print(len(dataset))
+    ds = dataset.data
+    # 1. Basic Info
+    print("Dataset Structure:")
+    print(ds)
 
-    # # 2. Feature Descriptions
-    # print("\nFeatures and Types:")
-    # print(ds['train'].features)
+    # 2. Feature Descriptions
+    print("\nFeatures and Types:")
+    print(ds['train'].features)
 
-    # # 3. General Statistics
-    # print("\nDataset Size:", len(ds['train']))
-    # print("First 3 Samples:\n", ds['train'][:3])
+    # 3. General Statistics
+    print("\nDataset Size:", len(ds['train']))
+    print("First 3 Samples:\n", ds['train'][:3])
     
 
-    # # Convert to pandas for better statistics
-    # df = df_train = ds['train'].to_pandas()
-    # print("\nNumerical Summary:")
-    # print(df.describe())
+    # Convert to pandas for better statistics
+    df = df_train = ds['train'].to_pandas()
+    print("\nNumerical Summary:")
+    print(df.describe())
 
-    # # 5. Distribution of Categorical Features (like categories)
-    # print("\nCategory Distribution:")
-    # print(df['categories'].value_counts())
+    # 5. Distribution of Categorical Features (like categories)
+    print("\nCategory Distribution:")
+    print(df['categories'].value_counts())
 
-    # # 6. Detect Missing Values
-    # print("\nMissing Values per Column:")
-    # print(df.isnull().sum())
+    # 6. Detect Missing Values
+    print("\nMissing Values per Column:")
+    print(df.isnull().sum())
     
-    
-    print(dataset.get_all_prompts())

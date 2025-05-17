@@ -3,3 +3,5 @@ HySAC/hysac.egg-info/*
 HySAC/__pycache__/*
 HySAC/hysac/*
 HySAC.egg-info/*
+embeddings_cache/*
+plots/*
