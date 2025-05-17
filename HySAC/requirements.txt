@@ -8,7 +8,7 @@ gradio_client==0.2.9
 httpx==0.24.0
 markdown2==2.4.10
 numpy==1.26.0
-peft==0.4.0
+peft==0.12.0
 scikit-learn==1.2.2
 sentencepiece==0.1.99
 shortuuid==1.0.11

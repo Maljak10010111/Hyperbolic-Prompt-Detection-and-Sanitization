@@ -7,8 +7,8 @@ from torch.nn import functional as F
 from transformers import CLIPTextModelWithProjection, CLIPVisionModelWithProjection, CLIPTokenizer
 from huggingface_hub import hf_hub_download
 from peft import LoraConfig, get_peft_model, PeftModel
-import hysac.utils.distributed as dist
-from hysac import lorentz as L
+import HySAC.hysac.utils.distributed as dist
+from HySAC.hysac import lorentz as L
 
 
 class CLIPBaseline(nn.Module):
@@ -120,12 +120,26 @@ class HySAC(CLIPBaseline):
         self.textual_alpha = nn.Parameter(torch.tensor(embed_dim**-0.5).log())
 
         self.bounds = bounds
+    
 
     @classmethod
     def from_pretrained(cls, repo_id: str = "aimagelab/HySAC", device="cpu"):
+        
+        
+        def convert_state_dict(state_dict):
+            new_state_dict = {}
+            for key, value in state_dict.items():
+                if 'base_layer' in key:
+                    new_key = key.replace('.base_layer', '')
+                    new_state_dict[new_key] = value
+                else:
+                    new_state_dict[key] = value
+            return new_state_dict
+        
+        
         # Download model weights
-        model_path = hf_hub_download(repo_id, "hysac_model.pth")
-        bounds_path = hf_hub_download(repo_id=repo_id, filename="hysac_bounds.json")
+        model_path = hf_hub_download(repo_id, "hysac_model.pth")#, force_download = True)
+        bounds_path = hf_hub_download(repo_id=repo_id, filename="hysac_bounds.json")#, force_download = True)
 
         with open(bounds_path, "r") as f:
             bounds = json.load(f)
@@ -147,7 +161,10 @@ class HySAC(CLIPBaseline):
 
         # Instantiate model
         model = cls(visual=vision_encoder, textual=text_encoder, bounds=bounds)
-        model.load_state_dict(torch.load(model_path, map_location=device))
+        state_dict = torch.load(model_path, map_location=device)
+        #state_dict = convert_state_dict(state_dict)
+        print('visual.base_model.model.vision_model.embeddings.patch_embedding.bias' in state_dict.keys())
+        model.load_state_dict(state_dict)
 
         return model
 
