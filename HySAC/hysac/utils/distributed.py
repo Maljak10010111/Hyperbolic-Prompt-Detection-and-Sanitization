@@ -166,3 +166,20 @@ def gpu_mem_usage() -> int:
         return torch.cuda.max_memory_allocated() // 1048576
     else:
         return 0
+
+
+def get_device(index=0):
+    # Check if CUDA is available
+    if torch.cuda.is_available():
+        print(f"CUDA is available. Total GPUs: {torch.cuda.device_count()}")
+        device = "cuda:" + str(index)  # Make sure this GPU exists
+        # Verify GPU 2 exists
+        if torch.cuda.device_count() <= 2:
+            print(
+                f"Warning: GPU 2 may not exist. Available GPUs: {torch.cuda.device_count()}"
+            )
+            device = f"cuda:0" if torch.cuda.device_count() > 0 else "cpu"
+    else:
+        print("CUDA not available, using CPU")
+        device = "cpu"
+    return device

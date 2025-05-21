@@ -146,3 +146,24 @@ best_checkpoint_saving_path: {best_checkpoint_saving_path}
 *********************************************
 '''
     print(epoch_summary)
+
+
+
+# Function to generate a unique identifier for embeddings cache
+def get_cache_filename(model_id, clip_backbone, dataset_name, split, batch_idx=None):
+    import os
+    import hashlib
+    # Create a hash of the model and dataset configuration
+    config_string = f"{model_id}_{clip_backbone}_{dataset_name}_{split}"
+    hash_obj = hashlib.md5(config_string.encode())
+    hash_str = hash_obj.hexdigest()
+
+    # Create cache directory if it doesn't exist
+    cache_dir = "embeddings_cache"
+    os.makedirs(cache_dir, exist_ok=True)
+
+    if batch_idx is not None:
+        return os.path.join(cache_dir, f"{hash_str}_batch_{batch_idx}.pt")
+    else:
+        return os.path.join(cache_dir, f"{hash_str}_all_embeddings.pt")
+
