@@ -138,8 +138,14 @@ class HySAC(CLIPBaseline):
         
         
         # Download model weights
-        model_path = hf_hub_download(repo_id, "hysac_model.pth")#, force_download = True)
-        bounds_path = hf_hub_download(repo_id=repo_id, filename="hysac_bounds.json")#, force_download = True)
+        try : 
+            model_path = hf_hub_download(repo_id, "hysac_model.pth")#, force_download = True)
+            bounds_path = hf_hub_download(repo_id=repo_id, filename="hysac_bounds.json")#, force_download = True)
+        except:
+            raise RuntimeError(
+                f"Could not download model weights from {repo_id}. "
+                "Please check the repository ID or your internet connection."
+            )
 
         with open(bounds_path, "r") as f:
             bounds = json.load(f)
@@ -268,3 +274,4 @@ class CLIPWrapper(nn.Module):
         if self.normalize:
             feats = feats / feats.norm(dim=-1, keepdim=True)
         return feats
+    
