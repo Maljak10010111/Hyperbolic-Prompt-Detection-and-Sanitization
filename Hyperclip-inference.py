@@ -30,8 +30,8 @@ def parse_args():
     parser.add_argument(
         "--datasets",
         nargs="+",
-        default=["i2p", "mscoco", "mma"],
-        help="List of datasets to process. Default: i2p, mscoco, mma",
+        default=["i2p", "mscoco", "mma", 'visu'],
+        help="List of datasets to process. Default: i2p, mscoco, mma, visu",
     )
 
     # CLIP model arguments
@@ -110,6 +110,10 @@ def main():
         "i2p": {"split": "train"},
         "mscoco": {"annotation_path": os.getenv("mscoco_path")},
         "mma": {"csv_file": os.getenv("mma_csv_file")},
+        "visu": {
+            "cache_dir": os.getenv("VISU_CACHE_DIR"),
+            "split": "train",
+        },
     }
 
     dataloaders = []
@@ -144,6 +148,8 @@ def main():
         full_embeddings_file = get_cache_filename(
             model_id, clip_backbone, dataset, "train", cache_dir=args.cache_dir
         )
+        # if the folder does not exist, create it
+        os.makedirs(os.path.dirname(full_embeddings_file), exist_ok=True)
 
         if os.path.exists(full_embeddings_file) and not args.force_recompute:
             print(f"Loading pre-computed embeddings from {full_embeddings_file}")

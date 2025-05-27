@@ -257,6 +257,6 @@ def get_cache_filename(
     os.makedirs(cache_dir, exist_ok=True)
 
     if batch_idx is not None:
-        return os.path.join(cache_dir, f"{hash_str}_batch_{batch_idx}.pt")
+        return os.path.join(cache_dir, dataset_name, f"{hash_str}_batch_{batch_idx}.pt")
     else:
-        return os.path.join(cache_dir, f"{hash_str}_all_embeddings.pt")
+        return os.path.join(cache_dir, dataset_name, f"{hash_str}_all_embeddings.pt")

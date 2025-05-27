@@ -6,6 +6,7 @@ DATASET_CLASS_MAP = {
     DatasetName.I2P: ("HySAC.hysac.dataset.i2p", "I2P"),
     DatasetName.MSCOCO: ("HySAC.hysac.dataset.mscoco", "MSCOCO"),  # Adjust if needed
     DatasetName.MMA: ("HySAC.hysac.dataset.mma", "MMA"),
+    DatasetName.VISU: ("HySAC.hysac.dataset.ViSu_text", "ViSuPrompts"),
 }
 
 
