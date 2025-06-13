@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
-from . import (LorentzReLU, LorentzBatchNorm1d, LorentzFullyConnected)
-from code.lib.lorentz.layers.LFC import  LorentzFullyConnectedNoTime
-from code.lib.lorentz.manifold import CustomLorentz
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 import os
+from utils.LorentzManifold import LorentzManifold
+from utils.RELU import LorentzReLU
+from utils.FullyConnectedLayer import LorentzFullyConnected, LorentzFullyConnectedNoTime
 
 
 
@@ -15,7 +15,7 @@ class LorentzMLP(nn.Module):
 
     def __init__(
         self,
-        manifold: CustomLorentz,
+        manifold: LorentzManifold,
         input_dim: int = 768,
         hidden_dim: int = 512,
         use_bias: bool = False,
@@ -27,7 +27,6 @@ class LorentzMLP(nn.Module):
         self.hidden_dim = hidden_dim
         self.use_bias = use_bias
 
-        self.norm = LorentzBatchNorm1d(self.manifold, self.input_dim)
 
         self.mlp = nn.Sequential(
             LorentzFullyConnected(self.manifold, self.input_dim, self.hidden_dim, self.use_bias),
@@ -47,19 +46,16 @@ class LorentzMLP(nn.Module):
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-manifold = CustomLorentz(k=2.3026)
+manifold = LorentzManifold(k=2.3026)
 model = LorentzMLP(manifold, 768, 512, use_bias=False).to(DEVICE)
-model.load_state_dict(torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/HyperbolicMLP/Hyperbolic_MLP_good.pth"))
+model.load_state_dict(torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/LorentzMLP/Hyperbolic_MLP.pth"))
 model.eval().to(DEVICE)
 
 
 # Hyperbolic CLIP test embeddings
 test_embeddings = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/test_embeddings.pt").to(DEVICE)
 
-# original CLIP test embeddings
-#TODO
-
-# labels
+# Hyperbolic CLIP test labels
 test_labels = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/test_labels.pt").long().to(DEVICE)
 
 test_dataset = TensorDataset(test_embeddings, test_labels)
@@ -109,7 +105,7 @@ plt.legend(loc="lower right")
 plt.grid(True)
 plt.tight_layout()
 
-roc_auc_path = "C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/HyperbolicMLP"
+roc_auc_path = "C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/LorentzMLP"
 os.makedirs(roc_auc_path, exist_ok=True)
 save_path = os.path.join(roc_auc_path, "roc_auc_curve.png")
 

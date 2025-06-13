@@ -12,9 +12,7 @@ class LorentzReLU(nn.Module):
         self.manifold = manifold
 
     def forward(self, x):
-        x_space = F.relu(x[..., 1:])  # apply ReLU on space
-        # Recompute time component to project back to manifold
+        x_space = F.relu(x[..., 1:])  # applying ReLU only on space components of vector x
         k = self.manifold.k
-        # x_time = torch.sqrt((x_space ** 2).sum(dim=-1, keepdim=True) + k + 1e-6)
-        x_time = torch.sqrt(torch.norm(x_space, dim=-1, keepdim=True) ** 2 + k)
+        x_time = torch.sqrt((x_space ** 2).sum(dim=-1, keepdim=True) + k)  # recomputing time component to project back to manifold
         return torch.cat([x_time, x_space], dim=-1)
