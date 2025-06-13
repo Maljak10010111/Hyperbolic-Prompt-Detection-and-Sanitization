@@ -1,7 +1,0 @@
-LICENSE
-README.md
-setup.py
-HyperbolicMLP.egg-info/PKG-INFO
-HyperbolicMLP.egg-info/SOURCES.txt
-HyperbolicMLP.egg-info/dependency_links.txt
-HyperbolicMLP.egg-info/top_level.txt
