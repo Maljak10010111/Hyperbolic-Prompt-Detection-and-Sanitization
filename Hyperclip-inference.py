@@ -89,8 +89,14 @@ def main():
 
     if "hysac" in model_id:
         print("loading hyperbolic CLIP model")
+
         model = HySAC.from_pretrained(model_id, device=device).to(device).eval()
         tokenizer = CLIPTokenizer.from_pretrained(clip_backbone)
+        print(model.curv)
+        print(model.visual_alpha)
+        print(model.textual_alpha)
+        print(model.logit_scale)
+        exit()
 
     else:
         print("loading standard clip model")
@@ -137,6 +143,7 @@ def main():
             dataset_args=dataset_kwargs[dataset],
             batch_size=batch_size,
         )
+        
 
         dataloaders.append(dataloader)
         embedding_paths.append(f"{dataset}_embeddings")

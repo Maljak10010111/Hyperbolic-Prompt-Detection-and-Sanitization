@@ -100,17 +100,27 @@ def _process_single_prompt_hysac(
         )
 
         # Get input IDs and move to device
-        text_input_ids = text_prompt_tokens["input_ids"].to(device)
+        text_prompt_tokens["input_ids"] = text_prompt_tokens["input_ids"].to(device)
+        text_prompt_tokens["attention_mask"] = text_prompt_tokens["attention_mask"].to(device)
+
+
+        # _curv = model.curv.exp()
+        # model.visual_alpha.data = torch.clamp(model.visual_alpha.data, max=0.0)
+        # model.textual_alpha.data = torch.clamp(model.textual_alpha.data, max=0.0)
+        # model.logit_scale.data = torch.clamp(model.logit_scale.data, max=4.6052, min=torch.tensor(1/0.07).log().item())
+        # _scale = model.logit_scale.exp()
+
+
 
         # Generate embeddings with no gradient tracking
         with torch.no_grad():
-            text_prompt_encoding = model.encode_text(text_input_ids, project=True)
+            text_prompt_encoding = model.encode_text(text_prompt_tokens["input_ids"], project=True)
 
         # Process embeddings and move to CPU
         flattened_encoding = text_prompt_encoding.squeeze(0).to("cpu")
 
         # Clean up to free memory
-        del text_input_ids
+        del text_prompt_tokens
         del text_prompt_encoding
         torch.cuda.empty_cache()
 
