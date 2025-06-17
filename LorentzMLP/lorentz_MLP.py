@@ -36,13 +36,13 @@ class LorentzMLP(nn.Module):
         )
 
     def forward(self, x):
-        x = self.manifold.add_time(x)
+        x = self.manifold.add_time(x) # x lies on hyperboloid, but it doesn't have time component => it has to be added!
         x = self.mlp(x)
         return x
 
 
-BATCH_SIZE = 256
-EPOCHS = 40
+BATCH_SIZE = 512
+EPOCHS = 100
 LR = 2e-3
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -66,7 +66,7 @@ model = LorentzMLP(manifold, input_dim, hidden_dim, use_bias=False).to(DEVICE)
 
 loss_fn = nn.BCEWithLogitsLoss()
 optimizer = RiemannianAdam(model.parameters(), lr=LR, weight_decay=1e-5)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=40, gamma=0.5)
 
 
 def evaluate(model, data_loader):
@@ -84,14 +84,18 @@ def evaluate(model, data_loader):
 
 
 class EarlyStopping:
-    def __init__(self, patience=10, mode='max'):
+    def __init__(self, patience=10, mode='max', enabled=True):
         self.patience = patience
         self.counter = 0
         self.best_score = None
         self.early_stop = False
         self.mode = mode
+        self.enabled = enabled
 
     def __call__(self, score):
+        if not self.enabled:
+            return
+
         if self.best_score is None:
             self.best_score = score
         elif (self.mode == 'max' and score <= self.best_score) or \
@@ -104,11 +108,11 @@ class EarlyStopping:
             self.counter = 0
 
 
-early_stopper = EarlyStopping(12, mode='max')
+early_stopper = EarlyStopping(patience=25, mode='max', enabled=False)
 best_val_acc = 0.0
 
 
-"""MLP TRAINING"""
+"""TRAINING the MLP in LORENTZ MODEL with TANGENT SPACE PROJECTION"""
 for epoch in range(EPOCHS):
     model.train()
     total_loss = 0.0
@@ -134,5 +138,5 @@ for epoch in range(EPOCHS):
     # save the model with the best validation accuracy
     if val_acc > best_val_acc:
         best_val_acc = val_acc
-        torch.save(model.state_dict(), "Hyperbolic_MLP_prova.pth")
+        torch.save(model.state_dict(), "models/Lorentz_MLP_prova_without_scheduler.pt")
         print(f"Saved new best model at epoch {epoch + 1} with Validation Accuracy: {val_acc:.4f}")
