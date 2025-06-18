@@ -67,7 +67,7 @@ val_labels = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Mo
 
 """ PROJECTING EMBEDDINGS FROM LORENTZ MODEL TO POINCARÉ BALL """
 # --------------------------------------------------------------------------
-# adding time component (dimension) that is missing for our HySac embeddings (they already lie on hyperboloid, they just don't have time dimension)
+# adding time component (dimension) that is missing for our HySac embeddings
 add_time_train = add_time_component(train_embeddings, 2.3026)
 add_time_val = add_time_component(val_embeddings, 2.3026)
 
