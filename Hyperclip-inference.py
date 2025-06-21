@@ -1,11 +1,8 @@
 from transformers import (
     CLIPTokenizer,
-    CLIPModel,
     CLIPVisionModelWithProjection,
     CLIPTextModelWithProjection,
-    CLIPTextModel
 )
-from peft import LoraConfig, get_peft_model
 from HySAC.hysac.dataset import *
 from HySAC.hysac.models import HySAC, CLIPBaseline, CLIPWrapper
 from HySAC.hysac.utils.distributed import get_device
