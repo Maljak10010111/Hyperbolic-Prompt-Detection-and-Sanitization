@@ -5,7 +5,7 @@
 
 import torch
 
-data = torch.load("C:/Users/Asus/PycharmProjects/Diffusion-Models-Embedding-Space-Defense/embeddings_cache/visu_training/03f7a6e1816195a039adf08998aa1691_all_embeddings.pt")
+data = torch.load("C:\\Users\\lemalak\\PyCharm Projects\\Research\\Diffusion-Models-Embedding-Space-Defense\\embeddings\\custom_2\\2d71250c95d5f635ab6a0d823c2d2bd7_all_embeddings.pt")
 
 embeddings = []
 labels = []
@@ -20,6 +20,6 @@ for item in data:
 X = torch.stack(embeddings).float()
 y = torch.tensor(labels).long()
 
-torch.save(X, "training_tensors.pt")
-torch.save(y, "training_labels.pt")
+torch.save(X, "../separated_embeddings/custom2_tensors.pt")
+torch.save(y, "../separated_embeddings/custom2_labels.pt")
 

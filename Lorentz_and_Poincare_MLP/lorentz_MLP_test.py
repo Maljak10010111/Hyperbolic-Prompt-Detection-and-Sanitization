@@ -48,15 +48,15 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 manifold = LorentzManifold(k=2.3026)
 model = LorentzMLP(manifold, 768, 512, use_bias=False).to(DEVICE)
-model.load_state_dict(torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/LorentzMLP/models/Lorentz_MLP.pt"))
+model.load_state_dict(torch.load("/Lorentz_and_Poincaré_MLP/models/Lorentz_MLP.pt"))
 model.eval().to(DEVICE)
 
 
 # Hyperbolic CLIP test embeddings (VISU dataset)
-test_embeddings = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/test_embeddings.pt").to(DEVICE)
+test_embeddings = torch.load("/embeddings/separated_embeddings/custom2_tensors.pt").to(DEVICE)
 
 # Hyperbolic CLIP test labels (VISU dataset)
-test_labels = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/test_labels.pt").long().to(DEVICE)
+test_labels = torch.load("/embeddings/separated_embeddings/custom2_labels.pt").long().to(DEVICE)
 
 test_dataset = TensorDataset(test_embeddings, test_labels)
 test_loader = DataLoader(test_dataset, batch_size=512, shuffle=False)
@@ -104,7 +104,7 @@ plt.tight_layout()
 
 roc_auc_path = "plots"
 os.makedirs(roc_auc_path, exist_ok=True)
-save_path = os.path.join(roc_auc_path, "lorentz_mlp_roc_auc_curve.png")
+save_path = os.path.join(roc_auc_path, "lorentz_mlp_roc_auc_curve_custom2.png")
 
 plt.savefig(save_path)
 print(f"ROC curve saved to: {save_path}")

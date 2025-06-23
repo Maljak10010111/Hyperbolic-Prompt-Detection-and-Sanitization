@@ -14,3 +14,13 @@ hyperbolic_safe_clip/*
 clip_embeddings/*
 safeclip_embeddings/*
 HySAC/hysac/__pycache__/*
+LorentzMLP/models/Lorentz_MLP.pt
+LorentzMLP/models/Poincare_MLP.pt
+LorentzMLP/models/SVM.pt
+LorentzMLP/test.py
+__pycache__/
+*.pyc
+embeddings
+training/separated_embeddings
+.idea
+

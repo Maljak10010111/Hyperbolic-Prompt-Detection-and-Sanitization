@@ -11,8 +11,8 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 K = 2.3026
 BATCH_SIZE = 512
 
-test_embeddings = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/test_embeddings.pt").to(DEVICE)
-test_labels = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/test_labels.pt").long().to(DEVICE)
+test_embeddings = torch.load("/embeddings/separated_embeddings/test_embeddings.pt").to(DEVICE)
+test_labels = torch.load("/embeddings/separated_embeddings/test_labels.pt").long().to(DEVICE)
 
 test_labels = 2 * test_labels - 1
 

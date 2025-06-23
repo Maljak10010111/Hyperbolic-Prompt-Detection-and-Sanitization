@@ -59,10 +59,10 @@ LR = 2e-3
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-train_embeddings = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/training_embeddings.pt").to(DEVICE)
-train_labels = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/training_labels.pt").long().to(DEVICE)
-val_embeddings = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/validation_embeddings.pt").to(DEVICE)
-val_labels = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/validation_labels.pt").long().to(DEVICE)
+train_embeddings = torch.load("/embeddings/separated_embeddings/training_embeddings.pt").to(DEVICE)
+train_labels = torch.load("/embeddings/separated_embeddings/training_labels.pt").long().to(DEVICE)
+val_embeddings = torch.load("/embeddings/separated_embeddings/validation_embeddings.pt").to(DEVICE)
+val_labels = torch.load("/embeddings/separated_embeddings/validation_labels.pt").long().to(DEVICE)
 
 
 """ PROJECTING EMBEDDINGS FROM LORENTZ MODEL TO POINCARÉ BALL """

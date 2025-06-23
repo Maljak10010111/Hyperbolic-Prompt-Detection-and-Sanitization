@@ -39,7 +39,7 @@ def parse_args():
     parser.add_argument(
         "--cache_dir",
         type=str,
-        default="embeddings_cache",
+        default="embeddings",
         help="Base directory to store embeddings. Default: embeddings_cache"
     )
 

@@ -13,10 +13,10 @@ MARGIN = 1
 WEIGHT_DECAY = 1e-4
 
 
-train_embeddings = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/training_embeddings.pt").to(DEVICE)
-train_labels = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/training_labels.pt").long().to(DEVICE)
-val_embeddings = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/validation_embeddings.pt").to(DEVICE)
-val_labels = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/training/separated_embeddings/validation_labels.pt").long().to(DEVICE)
+train_embeddings = torch.load("/embeddings/separated_embeddings/training_embeddings.pt").to(DEVICE)
+train_labels = torch.load("/embeddings/separated_embeddings/training_labels.pt").long().to(DEVICE)
+val_embeddings = torch.load("/embeddings/separated_embeddings/validation_embeddings.pt").to(DEVICE)
+val_labels = torch.load("/embeddings/separated_embeddings/validation_labels.pt").long().to(DEVICE)
 
 
 # converting labels from {0, 1} to {-1, 1} to be suitable for HINGE loss

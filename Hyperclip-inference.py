@@ -110,13 +110,14 @@ def main():
     print(f"Processing datasets: {', '.join(datasets)}")
 
     dataset_kwargs = {
-        "i2p": {"split": "train"},
-        "mscoco": {"annotation_path": os.getenv("mscoco_path")},
-        "mma": {"csv_file": os.getenv("mma_csv_file")},
-        "visu": {
-            "cache_dir": os.getenv("VISU_CACHE_DIR"),
-            "split": "train",
-        },
+        # "i2p": {"split": "train"},
+        # "mscoco": {"annotation_path": os.getenv("mscoco_path")},
+        # "mma": {"csv_file": os.getenv("mma_csv_file")},
+        # "visu": {
+        #     "cache_dir": os.getenv("VISU_CACHE_DIR"),
+        #     "split": "train",
+        # },
+        "custom_testdataset" : {"csv_file": os.getenv("custom_testdataset")}
     }
 
     dataloaders = []

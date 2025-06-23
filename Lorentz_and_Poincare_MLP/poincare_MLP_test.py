@@ -69,10 +69,10 @@ model.eval().to(DEVICE)
 
 
 # Hyperbolic CLIP test embeddings (VISU dataset)
-test_embeddings = torch.load("../training/separated_embeddings/test_embeddings.pt").to(DEVICE)
+test_embeddings = torch.load("../embeddings/separated_embeddings/custom_test_tensors.pt").to(DEVICE)
 
 # Hyperbolic CLIP test labels (VISU dataset)
-test_labels = torch.load("../training/separated_embeddings/test_labels.pt").long().to(DEVICE)
+test_labels = torch.load("../embeddings/separated_embeddings/custom_test_labels.pt").long().to(DEVICE)
 
 # adding time component to test embeddings
 add_time_test = add_time_component(test_embeddings, 2.3026)
@@ -127,7 +127,7 @@ plt.tight_layout()
 
 roc_auc_path = "plots"
 os.makedirs(roc_auc_path, exist_ok=True)
-save_path = os.path.join(roc_auc_path, "poincare_mlp_roc_auc_curve.png")
+save_path = os.path.join(roc_auc_path, "poincare_mlp_roc_auc_curve_custom2.png")
 
 plt.savefig(save_path)
 print(f"ROC curve saved to: {save_path}")
