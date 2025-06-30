@@ -7,7 +7,7 @@ from LMLR import LorentzMLR  # Assuming LorentzMLR is defined in LorentzMLR.py
 
 
 embedding_folders = (
-    "/mnt/ssd1/mary/Diffusion-Models-Embedding-Space-Defense/hyperbolic_safe_clip/visu"
+    "/mnt/ssd1/mary/Diffusion-Models-Embedding-Space-Defense/EMBEDDINGS/hyperbolic_safe_clip/visu"
 )
 # get the file that ends like all_embeddings.pt
 embedding_files = [
@@ -16,17 +16,33 @@ embedding_files = [
 
 # load the embeddings
 if os.path.exists(embedding_folders + "/" + embedding_files):
-    data = torch.load(embedding_folders + "/" + embedding_files)
+    train_data = torch.load(embedding_folders + "/" + embedding_files)
 else:
     raise FileNotFoundError(
         f"File {embedding_folders + '/' + embedding_files} does not exist."
     )
 
+validation_folder = '/mnt/ssd1/mary/Diffusion-Models-Embedding-Space-Defense/extraction_separation_mapping_of_embeddings/embeddings/validation_visu_embeddings'
+test_folder = '/mnt/ssd1/mary/Diffusion-Models-Embedding-Space-Defense/extraction_separation_mapping_of_embeddings/embeddings/test_visu_embeddings'
 
-# create a dataloader
-training_percent = 0.8
-validation_percent = 0.1
-test_percent = 0.1
+validation_files = [
+    f for f in os.listdir(validation_folder) if f.endswith("_embeddings.pt")
+]
+print(f"Validation files found: {validation_files}")
+test_files = [
+    f for f in os.listdir(test_folder) if f.endswith("_embeddings.pt")
+]
+if os.path.exists(validation_folder + "/" + validation_files[0]):
+    val_data = torch.load(validation_folder + "/" + validation_files[0])
+else:    raise FileNotFoundError(
+        f"File {validation_folder + '/' + validation_files[0]} does not exist."
+    )
+if os.path.exists(test_folder + "/" + test_files[0]):
+    test_data = torch.load(test_folder + "/" + test_files[0])
+else:
+    raise FileNotFoundError(
+        f"File {test_folder + '/' + test_files[0]} does not exist."
+    )
 
 
 # create a dataset
@@ -64,22 +80,9 @@ class HyperbolicEmbeddingDataset(torch.utils.data.Dataset):
 from sklearn.model_selection import train_test_split
 
 # Prepare your data indices and labels for stratification
-labels = [1 if item[1] == "malicious" else 0 for item in data]
-
-# Split train and temp (val+test) with stratification
-train_indices, temp_indices, train_labels, temp_labels = train_test_split(
-    range(len(data)), labels, test_size=0.2, stratify=labels, random_state=42
-)
-
-# Split temp into val and test
-val_indices, test_indices, val_labels, test_labels = train_test_split(
-    temp_indices, temp_labels, test_size=0.5, stratify=temp_labels, random_state=42
-)
-
-# Use indices to create datasets
-train_data = [data[i] for i in train_indices]
-val_data = [data[i] for i in val_indices]
-test_data = [data[i] for i in test_indices]
+train_labels = [1 if item[1] == "malicious" else 0 for item in train_data]
+val_labels = [1 if item[1] == "malicious" else 0 for item in val_data]
+test_labels = [1 if item[1] == "malicious" else 0 for item in test_data]
 
 train_dataset = HyperbolicEmbeddingDataset(train_data)
 val_dataset = HyperbolicEmbeddingDataset(val_data)

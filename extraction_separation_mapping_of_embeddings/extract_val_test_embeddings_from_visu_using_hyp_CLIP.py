@@ -5,9 +5,9 @@ from tqdm import tqdm
 from dotenv import load_dotenv
 
 from transformers import CLIPTokenizer
-from HySAC.hysac.models import HySAC
+from HySAC.hysac.models import HySAC as HySAC_model
 from HySAC.hysac.dataset.utils import get_dataloader_and_dataset
-from HySAC.hysac.dataset import DatasetName
+from HySAC.hysac.dataset.datasetsEnum import DatasetName
 from HySAC.hysac.utils.distributed import get_device
 from HySAC.hysac.utils.embedder import process_batch_embeddings
 
@@ -130,7 +130,7 @@ def main():
     ensure_directory(args.cache_dir)
 
     print("Loading model and tokenizer...")
-    model = HySAC.from_pretrained(args.model_id, device=device).to(device).eval()
+    model = HySAC_model.from_pretrained(args.model_id, device=device).to(device).eval()
     tokenizer = CLIPTokenizer.from_pretrained(args.clip_backbone)
 
     for split in ["validation", "test"]:
