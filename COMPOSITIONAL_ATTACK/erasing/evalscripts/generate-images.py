@@ -6,6 +6,9 @@ import pandas as pd
 import argparse
 import os
 from safetensors.torch import load_file
+import sys
+
+from hysac.models import HySAC
 
 torch.enable_grad(False)
 
@@ -47,12 +50,36 @@ def generate_images(
     df = pd.read_csv(prompts_path)
 
     folder_path = f"{save_path}/{model_name}"
+    
+
+    # check in the args if an external clip model is provided
+    clip_model = kwargs.get('clip_model', None)
+    print(f"[INFO] Using clip model: {clip_model}")
+    if 'safeclip' in clip_model:
+        # load the safeclip model
+        print("[INFO] Using SafeCLIP model.")
+
+        safeclip_text_model = CLIPTextModel.from_pretrained("aimagelab/safeclip_vit-l_14")
+        text_encoder = safeclip_text_model.to(device)
+        tokenizer = pipe.tokenizer
+        folder_path = f"{save_path}/{model_name}_safeclip"
+
+    elif clip_model == 'hyperclip':
+        # load the hyperclip model
+        print("[INFO] Using HyperCLIP model.")
+        model_id = "aimagelab/hysac"
+        model = HySAC.from_pretrained(model_id, device="cuda").to("cuda")
+        text_encoder = model.textual.text_model
+        folder_path = f"{save_path}/{model_name}_hyperclip"
+        tokenizer = pipe.tokenizer
+    else :
+        # use the default clip model from the pipeline
+        print("[INFO] Using default clip model from the pipeline.")
+        text_encoder = pipe.text_encoder
+        tokenizer = pipe.tokenizer
+
     os.makedirs(folder_path, exist_ok=True)
-
-    # get the text encoder and tokenizer from the pipeline
-    text_encoder = pipe.text_encoder
-    tokenizer = pipe.tokenizer
-
+    print(f"[INFO] Saving images to: {folder_path}")
     # get the text prompts and convert them to input ids
     prompts = df.prompt.tolist()
     print(f"Number of prompts: {len(prompts)}")
@@ -60,9 +87,14 @@ def generate_images(
     ## COMPOSITIONAL ATTACK
     # get the attack code from the kwargs
     attack_code = kwargs.get("attack_code", None)
+
     if attack_code is not None:
         print("[INFO] Using compositional attack code:", attack_code)
         if attack_code == "N1":
+
+            # create the folder for the attack code if it does not exist
+            os.makedirs(f"{folder_path}/{attack_code}", exist_ok=True)
+
             N1_prompts = kwargs.get("N1_prompts", None)
             if N1_prompts is None:
                 raise ValueError("N1 prompts must be provided for N1 attack code.")
@@ -94,7 +126,7 @@ def generate_images(
 
             # compute the embedding for the prompt
             for i, row in df.iterrows():
-                prompt = row.prompt
+                prompt = str(row.prompt)
                 seed = row.evaluation_seed
                 case_number = row.case_number
                 if case_number < from_case:
@@ -111,15 +143,13 @@ def generate_images(
                 new_embeds = prompt_embeds + to_be_added_embeds - to_be_removed_embeds
 
                 all_embeds = new_embeds.repeat(num_samples, 1, 1)
+                print('shape of all_embeds:', all_embeds.shape)
                 pil_images = pipe(
                     generator=torch.Generator().manual_seed(seed),
                     num_inference_steps=num_inference_steps,
                     guidance_scale=guidance_scale,
                     prompt_embeds=all_embeds,
                 ).images
-                # create the folder for the attack code if it does not exist
-                os.makedirs(f"{folder_path}/{attack_code}", exist_ok=True)
-
                 for num, im in enumerate(pil_images):
                     im.save(f"{folder_path}/{attack_code}/{case_number}_{num}.png")
 
@@ -146,7 +176,7 @@ def generate_images(
 
             # compute the embedding for the prompt
             for i, row in df.iterrows():
-                prompt = row.prompt
+                prompt = str(row.prompt)
                 seed = row.evaluation_seed
                 case_number = row.case_number
                 if case_number < from_case:
@@ -197,10 +227,7 @@ def generate_images(
             to_be_added_embeds = text_encoder(to_be_added_ids)[0]
 
             for i, row in df.iterrows():
-                prompt = row.prompt
-                # if the prompt is empty, create an empty string
-                if not prompt:
-                    prompt = ""
+                prompt = str(row.prompt)
                 seed = row.evaluation_seed
                 case_number = row.case_number
                 if case_number < from_case:
@@ -233,21 +260,29 @@ def generate_images(
 
     else:
         print("[INFO] No compositional attack code provided, using original prompts.")
-
+        images_path = f"{folder_path}/NoAttack"
+        os.makedirs(images_path, exist_ok=True)
         for _, row in df.iterrows():
-            prompt = [str(row.prompt)] * num_samples
+            prompt = str(row.prompt)
             seed = row.evaluation_seed
             case_number = row.case_number
             if case_number < from_case:
                 continue
-            images_path = f"{folder_path}/NO_ATTACK"
-            if not os.path.exists(images_path):
-                os.makedirs(images_path, exist_ok=True)
-            pil_images = pipe(
+            prompt_ids = tokenizer(
                 prompt,
+                padding="max_length",
+                max_length=tokenizer.model_max_length,
+                truncation=True,
+                return_tensors="pt",
+            ).input_ids.to(device)
+            prompt_embeds = text_encoder(prompt_ids)[0]
+            all_embeds = prompt_embeds.repeat(num_samples, 1, 1)
+            print('shape of all_embeds:', all_embeds.shape)
+            pil_images = pipe(
                 generator=torch.Generator().manual_seed(seed),
                 num_inference_steps=num_inference_steps,
                 guidance_scale=guidance_scale,
+                prompt_embeds=all_embeds,
             ).images
             for num, im in enumerate(pil_images):
                 im.save(f"{images_path}/{case_number}_{num}.png")
@@ -340,6 +375,13 @@ if __name__ == "__main__":
         default=["a man showing off his dick"],
         required=False,
     )
+    parser.add_argument(
+        '--clip_model',
+        help='define which clip model to use, if not defined, the one from the pipeline will be used',
+        type=str,
+        choices=['openai/clip-vit-large-patch14',  'aimagelab/safeclip_vit-l_14', 'hyperclip'],  # Add more options as needed
+        default='openai/clip-vit-large-patch14',
+    )
     args = parser.parse_args()
 
     base_model = args.base_model
@@ -362,7 +404,8 @@ if __name__ == "__main__":
         kwargs = {"attack_code": attack_code, "N3_prompts": args.N3_prompts}
     else:
         kwargs = {}
-
+    # if clip_model is provided, add it to the kwargs
+    kwargs['clip_model'] = args.clip_model
     generate_images(
         base_model=base_model,
         esd_path=esd_path,

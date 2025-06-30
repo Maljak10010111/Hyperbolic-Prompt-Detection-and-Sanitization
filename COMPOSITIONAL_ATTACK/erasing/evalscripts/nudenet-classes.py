@@ -86,6 +86,7 @@ if __name__ == "__main__":
             name = folder.split("/")[-2]
         save_path = f"{folder}/{name}_NudeClasses_{int(threshold*100)}.csv"
 
+
     image_paths = glob.glob(f"{folder}/*.png")
 
     detectNudeClasses(image_paths, prompts_path, save_path, threshold)

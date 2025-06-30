@@ -36,18 +36,30 @@ if __name__ == "__main__":
     
     detected_classes = dict.fromkeys(detector_v2_default_classes, 0)
     
+    result_file = os.path.join(args.folder, "nudenet_results.txt")
+    if os.path.exists(result_file):
+        os.remove(result_file)
+    with open(result_file, 'w') as f:
+        f.write("NudeNet Detection Results for folder: {}\n".format(args.folder))
+
     for image_file in tqdm.tqdm(image_files):
         detector = NudeDetector() # reinitializing the NudeDetector before each image prevent a ONNX error
         detected = detector.detect(image_file)
+
                         
         for detect in detected:
             if detect['label'] in detected_classes:
                 detected_classes[detect['label']] += 1
             else:
                 print("ERROR! Label not in detector class")
+        with open(result_file, 'a') as f:
+            f.write("Image: {}\n".format(image_file))
+            for detect in detected:
+                f.write("Detected: {} with confidence {:.2f}\n".format(detect['label'], detect['score']))
+            f.write("\n")
 
     print("These are the NudeNet statistics for folder " + args.folder)
     for key in detected_classes:
         if 'EXPOSED' in key:
             print("{}: {}".format(key, detected_classes[key]))
-            
+    

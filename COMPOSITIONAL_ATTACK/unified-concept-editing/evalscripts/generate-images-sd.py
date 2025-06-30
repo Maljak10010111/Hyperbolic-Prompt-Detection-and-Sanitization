@@ -56,6 +56,7 @@ def generate_images(
         folder_path = f"{save_path}/{exp_name}/{attack_code}"
         os.makedirs(folder_path, exist_ok=True)
         print("[INFO] Using compositional attack code:", attack_code)
+
         if attack_code == "N1":
             N1_prompts = kwargs.get("N1_prompts", None)
             if N1_prompts is None:
@@ -67,7 +68,7 @@ def generate_images(
             to_be_added = N1_prompts[0]
             # to_be_removed is the second prompt in the list
             to_be_removed = N1_prompts[1]
-
+            print(f"[INFO] to_be_added: {to_be_added}, to_be_removed: {to_be_removed}")
             # compute the text embeddings for the prompts
             to_be_added_ids = tokenizer(
                 to_be_added,
@@ -88,7 +89,7 @@ def generate_images(
 
             # compute the embedding for the prompt
             for i, row in df.iterrows():
-                prompt = row.prompt
+                prompt = str(row.prompt)
                 seed = row.evaluation_seed
                 case_number = row.case_number
                 if case_number < from_case:
@@ -105,6 +106,7 @@ def generate_images(
                 new_embeds = prompt_embeds + to_be_added_embeds - to_be_removed_embeds
 
                 all_embeds = new_embeds.repeat(num_images_per_prompt, 1, 1)
+
                 pil_images = pipe(
                     generator=torch.Generator().manual_seed(seed),
                     num_inference_steps=num_inference_steps,
@@ -125,6 +127,7 @@ def generate_images(
                 raise ValueError("N2 prompts must be a list of exactly one string.")
             # to_be_added is the first prompt in the list
             to_be_added = N2_prompts[0]
+            print(f"[INFO] to_be_added: {to_be_added}")
 
             # compute the text embeddings for the prompts
             to_be_added_ids = tokenizer(
@@ -139,7 +142,7 @@ def generate_images(
 
             # compute the embedding for the prompt
             for i, row in df.iterrows():
-                prompt = row.prompt
+                prompt = str(row.prompt)
                 seed = row.evaluation_seed
                 case_number = row.case_number
                 if case_number < from_case:
@@ -151,7 +154,7 @@ def generate_images(
                     truncation=True,
                     return_tensors="pt",
                 ).input_ids.to(device)
-                prompt_embeds = text_encoder(prompt_ids, attention_mask = text_encoder.config.attention_mask)[0]
+                prompt_embeds = text_encoder(prompt_ids)[0]
                 # compute the new embedding
                 new_embeds = prompt_embeds + to_be_added_embeds
 
@@ -187,10 +190,11 @@ def generate_images(
             ).input_ids.to(device)
 
             to_be_removed_embeds = text_encoder(to_be_removed_ids)[0]
+            print(f"[INFO] to_be_added: {to_be_removed}")
 
             for i, row in df.iterrows():
-                prompt = row.prompt
-                # if the ptompt is empty, create an empty string
+                prompt = str(row.prompt)
+                # if the prompt is empty, create an empty string
                 if not prompt:
                     prompt = ""
                 seed = row.evaluation_seed
@@ -206,7 +210,7 @@ def generate_images(
                 ).input_ids.to(device)
                 prompt_embeds = text_encoder(prompt_ids)[0]
                 # compute the new embedding
-                new_embeds = prompt_embeds - to_be_removed_embeds
+                new_embeds = prompt_embeds + to_be_removed_embeds
 
                 all_embeds = new_embeds.repeat(num_images_per_prompt, 1, 1)
                 pil_images = pipe(
