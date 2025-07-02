@@ -173,7 +173,7 @@ class HySAC(CLIPBaseline):
 
         return image_feats
 
-    def encode_text(self, tokens: list[torch.Tensor], project: bool):
+    def encode_text(self, tokens: list[torch.Tensor], project: bool, project_super: bool = False):
         """
         Args:
             tokens: List of tensors, each containing text tokens. Tensors may have
@@ -182,8 +182,16 @@ class HySAC(CLIPBaseline):
         """
 
         # Get Euclidean features from the encoder (without L2 normalization).
-        text_feats = super().encode_text(tokens, project=False)
+        # print characteristics of the tokens
+        text_feats = super().encode_text(tokens, project=project_super)
 
+        if project:
+            text_feats = text_feats * self.textual_alpha.exp()
+            text_feats = L.exp_map0(text_feats, self.curv.exp())
+           
+        return text_feats
+    
+    def _project_embeddings(self, text_feats: torch.Tensor, project: bool):
         if project:
             text_feats = text_feats * self.textual_alpha.exp()
             text_feats = L.exp_map0(text_feats, self.curv.exp())
