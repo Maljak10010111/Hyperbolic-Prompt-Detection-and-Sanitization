@@ -149,15 +149,20 @@ def process_saved_embeddings(lorentz_mlr, embeddings_base_path):
             
             if att is not None:
                 print(f"Attacked embedding shape before processing: {att.shape}")
-                att_hyperbolic = convert_to_hyperbolic_embedding(att, lorentz_mlr.manifold.k.item())
-                attacked_emb_list.append(att_hyperbolic)
-                print(f"Attacked embedding shape after processing: {att_hyperbolic.shape}")
+                #print(att[:5])
+                # att_hyperbolic = convert_to_hyperbolic_embedding(att, lorentz_mlr.manifold.k.item())
+                #print(att_hyperbolic[:5])
+                attacked_emb_list.append(att)
+                is_valid, violations = validate_lorentz_embedding(att, lorentz_mlr.manifold.k.item())
+                print(f"Manifold constraint validation - Valid: {is_valid.all().item()}, with violations max: {violations.max().item():.6f}")
+                # print(f"Attacked embedding shape after processing: {att_hyperbolic.shape}")
+
             
             if orig is not None:
                 print(f"Original embedding shape before processing: {orig.shape}")
-                orig_hyperbolic = convert_to_hyperbolic_embedding(orig, lorentz_mlr.manifold.k.item())
-                original_emb_list.append(orig_hyperbolic)
-                print(f"Original embedding shape after processing: {orig_hyperbolic.shape}")
+                #orig_hyperbolic = convert_to_hyperbolic_embedding(orig, lorentz_mlr.manifold.k.item())
+                original_emb_list.append(orig)
+                #print(f"Original embedding shape after processing: {orig_hyperbolic.shape}")
                 
         except Exception as e:
             print(f"Error processing file {emb_path}: {e}")
@@ -263,7 +268,7 @@ def main():
     print(f"Using device: {Config.DEVICE}")
     
     # Paths
-    embeddings_base_path = "/mnt/ssd1/mary/Diffusion-Models-Embedding-Space-Defense/COMPOSITIONAL_ATTACK/HyperbolicSD/out-images/visu_sdv14_hyperclip/N1/prompts"
+    embeddings_base_path = "/mnt/ssd1/mary/Diffusion-Models-Embedding-Space-Defense/COMPOSITIONAL_ATTACK/HyperbolicSD/out-images/safe_visu_text_prompts_sdv14_hyperclip/N1/prompts"
     state_dict_path = "/mnt/ssd1/mary/Diffusion-Models-Embedding-Space-Defense/LorentzMLR/final_hyperbolic_mlr_model.pth"
     csv_path = "/mnt/ssd1/mary/Diffusion-Models-Embedding-Space-Defense/COMPOSITIONAL_ATTACK/HyperbolicSD/data/mma_clean_prompts.csv"
     

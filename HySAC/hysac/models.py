@@ -53,8 +53,8 @@ class CLIPBaseline(nn.Module):
 
         return image_feats
 
-    def encode_text(self, tokens: list[torch.Tensor], project: bool):
-        # Truncate tokens that are longer than context_length:
+    def encode_text(self, tokens: list[torch.Tensor], project: bool, return_last_hidden_state: bool = False):
+
         for idx, inst_tokens in enumerate(tokens):
             if len(inst_tokens) > self.textual.config.max_position_embeddings:
                 eot_token = inst_tokens[-1]
@@ -64,14 +64,22 @@ class CLIPBaseline(nn.Module):
 
         # Pad all tokens on the right.
         tokens = torch.nn.utils.rnn.pad_sequence(tokens, batch_first=True)
+
         tokens = tokens.to(self.device)
 
         # shape: (batch_size, context_length, textual.width)
-        text_feats = self.textual(input_ids=tokens).text_embeds
+        output = self.textual(  
+            input_ids=tokens,
+            output_hidden_states=return_last_hidden_state,
+        )
+        text_feats = output.text_embeds
+        last_hidden_state = output.last_hidden_state
 
         if project:
             text_feats = F.normalize(text_feats, dim=-1)
 
+        if return_last_hidden_state:
+            return text_feats, last_hidden_state
         return text_feats
 
 
@@ -173,7 +181,7 @@ class HySAC(CLIPBaseline):
 
         return image_feats
 
-    def encode_text(self, tokens: list[torch.Tensor], project: bool, project_super: bool = False):
+    def encode_text(self, tokens: list[torch.Tensor], project: bool, project_super: bool = False, return_last_hidden_state: bool = False):
         """
         Args:
             tokens: List of tensors, each containing text tokens. Tensors may have
@@ -183,12 +191,15 @@ class HySAC(CLIPBaseline):
 
         # Get Euclidean features from the encoder (without L2 normalization).
         # print characteristics of the tokens
-        text_feats = super().encode_text(tokens, project=project_super)
+        if return_last_hidden_state:
+            text_feats, last_hidden_state = super().encode_text(tokens, project=project_super, return_last_hidden_state=return_last_hidden_state)
 
-        if project:
-            text_feats = text_feats * self.textual_alpha.exp()
-            text_feats = L.exp_map0(text_feats, self.curv.exp())
-           
+        else:
+            text_feats = super().encode_text(tokens, project=False, return_last_hidden_state=return_last_hidden_state)
+        
+        text_feats = self._project_embeddings(text_feats, project=project)
+        if return_last_hidden_state:
+            return text_feats, last_hidden_state
         return text_feats
     
     def _project_embeddings(self, text_feats: torch.Tensor, project: bool):
