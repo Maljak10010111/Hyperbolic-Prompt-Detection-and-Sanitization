@@ -201,6 +201,35 @@ class HySAC(CLIPBaseline):
         if return_last_hidden_state:
             return text_feats, last_hidden_state
         return text_feats
+
+    def encode_text_tokens(self, tokens: list[torch.Tensor], project: bool = True):
+        """
+        Return token-level embeddings from the HySAC encoder.
+
+        Args:
+            tokens: List of token ID tensors for each prompt.
+            project: Whether to project to the hyperboloid.
+
+        Returns:
+            Tensor of shape (batch_size, seq_len, embed_dim)
+        """
+        for idx, inst_tokens in enumerate(tokens):
+            if len(inst_tokens) > self.textual.config.max_position_embeddings:
+                eot_token = inst_tokens[-1]
+                inst_tokens = inst_tokens[: self.textual.config.max_position_embeddings]
+                inst_tokens[-1] = eot_token
+                tokens[idx] = inst_tokens
+
+        tokens = torch.nn.utils.rnn.pad_sequence(tokens, batch_first=True).to(self.device)
+
+        hidden_states = self.textual(input_ids=tokens, output_hidden_states=True).hidden_states[-1]  # shape (1, 77, 768)
+
+        if project:
+            scaled = hidden_states * self.textual_alpha.exp()
+            projected = L.exp_map0(scaled, self.curv.exp())
+            return projected
+        else:
+            return hidden_states
     
     def _project_embeddings(self, text_feats: torch.Tensor, project: bool):
         if project:

@@ -104,7 +104,9 @@ def _process_single_prompt_hysac(
         text_prompt_tokens["attention_mask"] = text_prompt_tokens["attention_mask"].to(device)
         # Generate embeddings with no gradient tracking
         with torch.no_grad():
-            text_prompt_encoding = model.encode_text(text_prompt_tokens["input_ids"], project=True)
+            # text_prompt_encoding = model.encode_text(text_prompt_tokens["input_ids"], project=True)
+            text_prompt_encoding = model.encode_text_tokens(text_prompt_tokens["input_ids"], project=True) # token level embeddings
+
         # Process embeddings and move to CPU
         flattened_encoding = text_prompt_encoding.squeeze(0).to("cpu")
         # Clean up to free memory
