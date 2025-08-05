@@ -14,13 +14,28 @@ hyperbolic_safe_clip/*
 clip_embeddings/*
 safeclip_embeddings/*
 HySAC/hysac/__pycache__/*
-LorentzMLP/models/Lorentz_MLP.pt
-LorentzMLP/models/Poincare_MLP.pt
-LorentzMLP/models/SVM.pt
-LorentzMLP/test.py
+Lorentz_and_Poincare_MLP/models/Lorentz_MLP.pt
+Lorentz_and_Poincare_MLP/models/Poincare_MLP.pt
+Lorentz_and_Poincare_MLP/models/SVM.pt
+Lorentz_and_Poincare_MLP/test.py
 __pycache__/
 *.pyc
 embeddings
-training/separated_embeddings
+embeddings/separated_embeddings
 .idea
+XAI/xai_attempts/xai_brute_force_single_token.py
+XAI/xai_attempts/xai_brute_force_multiple_chunks.py
+XAI/xai_attempts/BERT.py
+XAI/xai_attempts
+XAI/HySAC
+XAI/xai/local files
+euclidean_MLP/MLP.pth
+euclidean_MLP/MLP_attempt.py
+euclidean_MLP/token_aware_euclidean_MLP.py
+euclidean_MLP/token_aware_test.py
+Hyperclip-inference.py
+extraction_separation_mapping_of_embeddings/separating_token_level_embeddings_and_labels.py
+embeddings_custom_dataset
+env.yaml
+embeddings_extraction.py
 

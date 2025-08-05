@@ -101,12 +101,12 @@ if __name__ == '__main__':
     # get prompt embeds
     with torch.no_grad():
         # for concept prompt and null prompt
-        erase_embeds, null_embeds, erase_pooled_embeds, null_pooled_embeds = pipe.encode_prompt(prompt=erase_concept,
-                                                                                                device=device,
-                                                                                                num_images_per_prompt=batchsize,
-                                                                                                do_classifier_free_guidance=True,
-                                                                                                negative_prompt="",
-                                                                                                )
+        erase_embeds, null_embeds, erase_pooled_embeds, null_pooled_embeds = pipe.encode_tokens_inside_prompt(prompt=erase_concept,
+                                                                                                              device=device,
+                                                                                                              num_images_per_prompt=batchsize,
+                                                                                                              do_classifier_free_guidance=True,
+                                                                                                              negative_prompt="",
+                                                                                                              )
         erase_embeds = erase_embeds.to(device)
         null_embeds = null_embeds.to(device)
         add_erase_embeds = erase_pooled_embeds.to(device)
@@ -135,12 +135,12 @@ if __name__ == '__main__':
         
         
         if erase_concept_from is not None:
-            erase_from_embeds, _, erase_from_pooled_embeds, _ = pipe.encode_prompt(prompt=erase_concept_from,
-                                                                                    device=device,
-                                                                                    num_images_per_prompt=batchsize,
-                                                                                    do_classifier_free_guidance=False,
-                                                                                    negative_prompt="",
-                                                                                    )
+            erase_from_embeds, _, erase_from_pooled_embeds, _ = pipe.encode_tokens_inside_prompt(prompt=erase_concept_from,
+                                                                                                 device=device,
+                                                                                                 num_images_per_prompt=batchsize,
+                                                                                                 do_classifier_free_guidance=False,
+                                                                                                 negative_prompt="",
+                                                                                                 )
             add_erase_from_embeds = erase_from_pooled_embeds.to(device)
             erase_from_embeds = erase_from_embeds.to(device)
     
@@ -191,12 +191,12 @@ if __name__ == '__main__':
     # get prompt embeds
     with torch.no_grad():
         # for concept prompt and null prompt
-        erase_embeds, null_embeds, erase_pooled_embeds, null_pooled_embeds = pipe.encode_prompt(prompt=erase_concept,
-                                                                                                device=device,
-                                                                                                num_images_per_prompt=batchsize,
-                                                                                                do_classifier_free_guidance=True,
-                                                                                                negative_prompt="",
-                                                                                                )
+        erase_embeds, null_embeds, erase_pooled_embeds, null_pooled_embeds = pipe.encode_tokens_inside_prompt(prompt=erase_concept,
+                                                                                                              device=device,
+                                                                                                              num_images_per_prompt=batchsize,
+                                                                                                              do_classifier_free_guidance=True,
+                                                                                                              negative_prompt="",
+                                                                                                              )
         erase_embeds = erase_embeds.to(device)
         null_embeds = null_embeds.to(device)
         add_erase_embeds = erase_pooled_embeds.to(device)
@@ -225,12 +225,12 @@ if __name__ == '__main__':
         
         
         if erase_concept_from is not None:
-            erase_from_embeds, _, erase_from_pooled_embeds, _ = pipe.encode_prompt(prompt=erase_concept_from,
-                                                                                    device=device,
-                                                                                    num_images_per_prompt=batchsize,
-                                                                                    do_classifier_free_guidance=False,
-                                                                                    negative_prompt="",
-                                                                                    )
+            erase_from_embeds, _, erase_from_pooled_embeds, _ = pipe.encode_tokens_inside_prompt(prompt=erase_concept_from,
+                                                                                                 device=device,
+                                                                                                 num_images_per_prompt=batchsize,
+                                                                                                 do_classifier_free_guidance=False,
+                                                                                                 negative_prompt="",
+                                                                                                 )
             add_erase_from_embeds = erase_from_pooled_embeds.to(device)
             erase_from_embeds = erase_from_embeds.to(device)
     

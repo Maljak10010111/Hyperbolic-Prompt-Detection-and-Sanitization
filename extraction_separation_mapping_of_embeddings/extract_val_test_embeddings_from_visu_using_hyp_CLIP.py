@@ -77,7 +77,7 @@ def process_visu_split(split, args, model, tokenizer, device):
     }
 
     dataloader, dataset = get_dataloader_and_dataset(
-        dataset_name=DatasetName("visu"),
+        dataset_name=DatasetName("visu_validation"),
         dataset_args=dataset_args,
         batch_size=int(os.getenv("visu_batch_size", 32))
     )

@@ -171,7 +171,7 @@ def esd_sdxl_call(
         negative_prompt_embeds,
         pooled_prompt_embeds,
         negative_pooled_prompt_embeds,
-    ) = self.encode_prompt(
+    ) = self.encode_tokens_inside_prompt(
         prompt=prompt,
         prompt_2=prompt_2,
         device=device,

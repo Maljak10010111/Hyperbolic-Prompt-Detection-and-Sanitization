@@ -94,11 +94,11 @@ if __name__ == '__main__':
 
     with torch.no_grad():
         # get prompt embeds
-        erase_embeds, null_embeds = pipe.encode_prompt(prompt=erase_concept,
-                                                       device=device,
-                                                       num_images_per_prompt=batchsize,
-                                                       do_classifier_free_guidance=True,
-                                                       negative_prompt='')
+        erase_embeds, null_embeds = pipe.encode_tokens_inside_prompt(prompt=erase_concept,
+                                                                     device=device,
+                                                                     num_images_per_prompt=batchsize,
+                                                                     do_classifier_free_guidance=True,
+                                                                     negative_prompt='')
                                                  
         erase_embeds = erase_embeds.to(device)
         null_embeds = null_embeds.to(device)
@@ -111,12 +111,12 @@ if __name__ == '__main__':
             ).to(device=device, dtype=torch_dtype)
         
         if erase_concept_from is not None:
-            erase_from_embeds, _ = pipe.encode_prompt(prompt=erase_concept_from,
-                                                                device=device,
-                                                                num_images_per_prompt=batchsize,
-                                                                do_classifier_free_guidance=False,
-                                                                negative_prompt="",
-                                                                )
+            erase_from_embeds, _ = pipe.encode_tokens_inside_prompt(prompt=erase_concept_from,
+                                                                    device=device,
+                                                                    num_images_per_prompt=batchsize,
+                                                                    do_classifier_free_guidance=False,
+                                                                    negative_prompt="",
+                                                                    )
             erase_from_embeds = erase_from_embeds.to(device)
     
     

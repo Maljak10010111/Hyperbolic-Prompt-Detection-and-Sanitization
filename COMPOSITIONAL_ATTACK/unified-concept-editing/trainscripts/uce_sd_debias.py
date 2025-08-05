@@ -50,10 +50,10 @@ def UCE(pipe, clip, edit_concepts, debias_concepts, preserve_concepts, edit_scal
     for e in edit_concepts + debias_concepts + preserve_concepts:
         if e in uce_erase_embeds:
             continue
-        t_emb = pipe.encode_prompt(prompt=e,
-                                   device=device,
-                                   num_images_per_prompt=1,
-                                   do_classifier_free_guidance=False)
+        t_emb = pipe.encode_tokens_inside_prompt(prompt=e,
+                                                 device=device,
+                                                 num_images_per_prompt=1,
+                                                 do_classifier_free_guidance=False)
     
         last_token_idx = (pipe.tokenizer(e,
                                           padding="max_length",
@@ -70,10 +70,10 @@ def UCE(pipe, clip, edit_concepts, debias_concepts, preserve_concepts, edit_scal
         if g in uce_guide_outputs:
             continue
     
-        t_emb = pipe.encode_prompt(prompt=g,
-                                   device=device,
-                                   num_images_per_prompt=1,
-                                   do_classifier_free_guidance=False)
+        t_emb = pipe.encode_tokens_inside_prompt(prompt=g,
+                                                 device=device,
+                                                 num_images_per_prompt=1,
+                                                 do_classifier_free_guidance=False)
     
         last_token_idx = (pipe.tokenizer(g,
                                           padding="max_length",

@@ -1,6 +1,6 @@
 import torch
 import pandas as pd
-from LMLR import LorentzMLR
+from LorentzMLR.LMLR import LorentzMLR
 from geoopt.manifolds.lorentz import Lorentz
 from transformers import CLIPTokenizer
 from HySAC.hysac.models import HySAC

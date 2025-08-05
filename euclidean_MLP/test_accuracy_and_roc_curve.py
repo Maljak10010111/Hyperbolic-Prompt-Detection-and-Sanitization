@@ -45,7 +45,7 @@ test_embeddings = torch.load("C:/Users/Asus/PycharmProjects/Diffusion-Models-Emb
 # test_embeddings = torch.load("../extraction_separation_mapping_of_embeddings/test_tensors.pt").to(DEVICE)
 
 # labels
-test_labels = torch.load("../extraction_separation_mapping_of_embeddings/test_labels.pt").long().to(DEVICE)
+test_labels = torch.load("../../extraction_separation_mapping_of_embeddings/test_labels.pt").long().to(DEVICE)
 
 test_dataset = TensorDataset(test_embeddings, test_labels)
 test_loader = DataLoader(test_dataset, batch_size=512, shuffle=False)

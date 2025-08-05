@@ -5,7 +5,7 @@
 
 import torch
 
-data = torch.load("C:\\Users\\lemalak\\PyCharm Projects\\Research\\Diffusion-Models-Embedding-Space-Defense\\embeddings\\custom_2\\2d71250c95d5f635ab6a0d823c2d2bd7_all_embeddings.pt")
+data = torch.load("C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/embeddings_custom_dataset/custom_testdataset/d04e162e3c8fedd0f50d106625c28374_all_embeddings.pt")
 
 embeddings = []
 labels = []
@@ -15,11 +15,12 @@ for item in data:
     label = item[1]
 
     embeddings.append(emb)
-    labels.append(0 if label == "benign" else 1)
+    labels.append(label)
+    # labels.append(0 if label == "benign" else 1)
 
 X = torch.stack(embeddings).float()
 y = torch.tensor(labels).long()
 
-torch.save(X, "../separated_embeddings/custom2_tensors.pt")
-torch.save(y, "../separated_embeddings/custom2_labels.pt")
+torch.save(X, "C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/embeddings_custom_dataset/separated/custom_embeddings.pt")
+torch.save(y, "C:/Users/lemalak/PyCharm Projects/Research/Diffusion-Models-Embedding-Space-Defense/embeddings_custom_dataset/separated/custom_labels.pt")
 

@@ -3,19 +3,21 @@ from transformers import (
     CLIPVisionModelWithProjection,
     CLIPTextModelWithProjection,
 )
-from HySAC.hysac.dataset import *
+import os
+import sys
+sys.path.append(os.path.abspath(
+    "/data/imaljkovic/Diffusion-Models-Embedding-Space-Defense"
+))
+from HySAC.hysac.dataset.utils import DatasetName
 from HySAC.hysac.models import HySAC, CLIPBaseline, CLIPWrapper
 from HySAC.hysac.utils.distributed import get_device
 from HySAC.hysac.utils.logger import get_cache_filename
 from HySAC.hysac.dataset.utils import get_dataloader_and_dataset
 from HySAC.hysac.utils.embedder import process_batch_embeddings
-
-from tqdm import tqdm
 from dotenv import load_dotenv
 import torch
 import os
 import argparse
-import pickle
 
 
 def parse_args():
@@ -27,8 +29,8 @@ def parse_args():
     parser.add_argument(
         "--datasets",
         nargs="+",
-        default=["i2p", "mscoco", "mma", 'visu'],
-        help="List of datasets to process. Default: i2p, mscoco, mma, visu",
+        default=["i2p", "mscoco", "mma", 'visu_validation'],
+        help="List of datasets to process. Default: i2p, mscoco, mma, visu_validation",
     )
 
     # CLIP model arguments
@@ -50,12 +52,6 @@ def parse_args():
         "--device_id", type=int, default=0, help="GPU device ID to use. Default: 0"
     )
     parser.add_argument(
-        "--output_file",
-        type=str,
-        default="embeddings.pkl",
-        help="Output file path for embeddings. Default: embeddings.pkl",
-    )
-    parser.add_argument(
         "--force_recompute",
         action="store_true",
         help="Force recomputation of embeddings even if cache exists",
@@ -63,7 +59,7 @@ def parse_args():
     parser.add_argument(
         "--cache_dir",
         type=str,
-        default="embeddings_cache",
+        default="token_level_embeddings",
         help="Directory to store embeddings cache. Default: embeddings_cache",
     )
 
@@ -89,11 +85,6 @@ def main():
 
         model = HySAC.from_pretrained(model_id, device=device).to(device).eval()
         tokenizer = CLIPTokenizer.from_pretrained(clip_backbone)
-        print(model.curv)
-        print(model.visual_alpha)
-        print(model.textual_alpha)
-        print(model.logit_scale)
-        exit()
 
     else:
         print("loading standard clip model")
@@ -110,14 +101,10 @@ def main():
     print(f"Processing datasets: {', '.join(datasets)}")
 
     dataset_kwargs = {
-        # "i2p": {"split": "train"},
-        # "mscoco": {"annotation_path": os.getenv("mscoco_path")},
-        # "mma": {"csv_file": os.getenv("mma_csv_file")},
-        # "visu": {
-        #     "cache_dir": os.getenv("VISU_CACHE_DIR"),
-        #     "split": "train",
-        # },
-        "custom_testdataset" : {"csv_file": os.getenv("custom_testdataset")}
+        "visu_validation": {
+            "cache_dir": os.getenv("VISU_CACHE_DIR"),
+            "split": "test",
+        }
     }
 
     dataloaders = []
@@ -134,7 +121,7 @@ def main():
             continue
 
         batch_size = int(
-            os.getenv(f"{dataset}_batch_size", 32)
+            os.getenv(f"{dataset}_batch_size", 512)
         )  # Default to 32 if not specified
         dataloader, dataset_torch = get_dataloader_and_dataset(
             dataset_name=DatasetName(dataset),
@@ -144,14 +131,20 @@ def main():
         
 
         dataloaders.append(dataloader)
-        embedding_paths.append(f"{dataset}_embeddings")
+        embedding_paths.append(f"{dataset}_embeddings_")
         all_prompts, all_categories = dataset_torch.get_all_prompt_and_categories()
+
+        # taking only 10% of the dataset
+        subset_size = int(0.1 * len(all_prompts))
+        all_prompts = all_prompts[:subset_size]
+        all_categories = all_categories[:subset_size]
+
         print(f"Number of prompts: {len(all_prompts)}")
         print(all_prompts[:3])
         print(f"Number of categories: {len(all_categories)}")
 
         full_embeddings_file = get_cache_filename(
-            model_id, clip_backbone, dataset, "train", cache_dir=args.cache_dir
+            model_id, clip_backbone, dataset, "test", cache_dir=args.cache_dir
         )
         # if the folder does not exist, create it
         os.makedirs(os.path.dirname(full_embeddings_file), exist_ok=True)
@@ -165,7 +158,7 @@ def main():
 
             for batch_idx in range(0, len(all_prompts), batch_size):
                 batch_cache_file = get_cache_filename(
-                    model_id, clip_backbone, dataset, "train", batch_idx, cache_dir=args.cache_dir
+                    model_id, clip_backbone, dataset, "test", batch_idx, cache_dir=args.cache_dir
                 )
 
                 # Check if this batch has already been processed
@@ -205,14 +198,9 @@ def main():
             raise RuntimeError("Embeddings not correctly computed")
         print(f"Total captions collected: {len(global_captions)}")
 
-    # Save the joint embeddings in a pickle file
-    print(f"Saving embeddings to {args.output_file}")
-    with open(args.output_file, "wb") as f:
-        pickle.dump([global_embeddings, global_captions], f)
 
     print("Process completed successfully!")
 
 
 if __name__ == "__main__":
     main()
-    # "aimagelab/safeclip_vit-l_14" -> SafeClip

@@ -45,12 +45,12 @@ def UCE(model_id, edit_concepts, guide_concepts, preserve_concepts, erase_scale,
     for e in edit_concepts + guide_concepts + preserve_concepts:
         if e in uce_erase_embeds:
             continue
-        t_emb = pipe.encode_prompt(prompt=e,
-                                   prompt_2=None,
-                                   device=device,
-                                   num_images_per_prompt=1,
-                                   max_sequence_length=max_sequence_length
-                                   )
+        t_emb = pipe.encode_tokens_inside_prompt(prompt=e,
+                                                 prompt_2=None,
+                                                 device=device,
+                                                 num_images_per_prompt=1,
+                                                 max_sequence_length=max_sequence_length
+                                                 )
     
         last_token_idx = (pipe.tokenizer_2(e,
                                            padding="max_length",
