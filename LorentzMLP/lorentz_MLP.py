@@ -1,9 +1,14 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import TensorDataset, DataLoader
-from Lorentz_and_Poincare_MLP.utils.RELU import LorentzReLU
-from Lorentz_and_Poincare_MLP.utils.FullyConnectedLayer import LorentzFullyConnected, LorentzFullyConnectedNoTime
-from Lorentz_and_Poincare_MLP.utils.LorentzManifold import LorentzManifold
+import sys
+import os
+sys.path.append(os.path.abspath(
+    "C:/Users/lemalak/PyCharmProjects/Research/Diffusion-Models-Embedding-Space-Defense"
+))
+from LorentzMLP.utils.RELU import LorentzReLU
+from LorentzMLP.utils.FullyConnectedLayer import LorentzFullyConnected, LorentzFullyConnectedNoTime
+from LorentzMLP.utils.LorentzManifold import LorentzManifold
 from geoopt.optim import RiemannianAdam
 
 
@@ -40,7 +45,8 @@ class LorentzMLP(nn.Module):
         x = self.mlp(x)
         return x
 
-if __name__ == "__main__": # moved training code under the main to use the MLP inside XAI (avoiding retraining)
+
+if __name__ == "__main__":
 
     BATCH_SIZE = 512
     EPOCHS = 100
@@ -139,5 +145,5 @@ if __name__ == "__main__": # moved training code under the main to use the MLP i
         # save the model with the best validation accuracy
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), "models/Lorentz_MLP_prova_without_scheduler.pt")
+            torch.save(model.state_dict(), "../models/Lorentz_MLP_prova_without_scheduler.pt")
             print(f"Saved new best model at epoch {epoch + 1} with Validation Accuracy: {val_acc:.4f}")
