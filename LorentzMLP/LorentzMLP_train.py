@@ -127,7 +127,7 @@ def train():
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), "../models/assfa.pt")
+            torch.save(model.state_dict(), "../models/Lorentz_MLP_model.pt")
             print(f"Saved new best model at epoch {epoch + 1} with Validation Accuracy: {val_acc:.4f}")
 
 
