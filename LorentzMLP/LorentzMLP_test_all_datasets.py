@@ -18,7 +18,6 @@ from LorentzMLP.lorentz_MLP import LorentzMLP
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# Load model
 manifold = LorentzManifold(k=2.3026)
 model = LorentzMLP(manifold, 768, 512, use_bias=False).to(DEVICE)
 model.load_state_dict(torch.load(
@@ -27,16 +26,10 @@ model.load_state_dict(torch.load(
 model.eval()
 
 
-# Evaluation function
-def evaluate_and_save_results(name, embedding_path, label_tensor=None):
+def evaluate_and_save_results(name, embedding_path, label_tensor):
     print(f"\n--- Evaluating: {name} ---")
 
-    # Load embeddings
     embeddings = torch.load(embedding_path).to(DEVICE)
-
-    # If labels not provided, use all-ones (malicious)
-    if label_tensor is None:
-        label_tensor = torch.ones(embeddings.size(0)).long().to(DEVICE)
 
     dataset = TensorDataset(embeddings, label_tensor)
     loader = DataLoader(dataset, batch_size=512, shuffle=False)
@@ -102,7 +95,6 @@ def evaluate_and_save_results(name, embedding_path, label_tensor=None):
     plt.savefig(f"plots/lorentz_MLP_roc_auc_curve_{name}.png")
     plt.close()
 
-    # Save metrics
     results = {
         "accuracy": round(accuracy, 4),
         "precision": round(precision, 4),
@@ -139,6 +131,3 @@ for name, info in datasets.items():
         torch.load(info["labels"]).long().to(DEVICE) if info["labels"] else None
     )
     evaluate_and_save_results(name, info["path"], label_tensor)
-
-
-
