@@ -25,8 +25,8 @@ from HySAC.hysac.models import HySAC
 from LorentzMLR.LMLR import LorentzMLR
 from LorentzMLR.classify_embeddings import convert_to_hyperbolic_embedding
 from geoopt.manifolds.lorentz import Lorentz
-from Lorentz_and_Poincare_MLP.lorentz_MLP import LorentzMLP
-from Lorentz_and_Poincare_MLP.utils.LorentzManifold import LorentzManifold
+from LorentzMLP.LorentzMLP_train import LorentzMLP
+from LorentzMLP.utils.LorentzManifold import LorentzManifold
 
 MERRIAM_WEBSTER_API_KEY = "10cc0688-e590-4b23-b41e-930b84406801"
 
@@ -152,25 +152,27 @@ def remove_word(text, word):
     return text
 
 
-def process_prompt(prompt, word_attributions, k, model_predict_fn):
-    top_words = get_top_k_influential_words(word_attributions, k=k)
+def process_prompt(harmful_prompt, word_attributions, k, model_predict_fn):
+    top_harmful_words = get_top_k_influential_words(word_attributions, k=k)
     result = {
-        "original_prompt": prompt,
-        "top_influential_words": top_words,
+        "original_prompt": harmful_prompt,
+        "top_influential_words": top_harmful_words,
     }
     antonyms_list = []
-    new_prompt = prompt
-    for word in top_words:
-        antonyms = get_thesaurus_antonyms(word) if word else []
+    for harmful_word in top_harmful_words:
+        antonyms = get_thesaurus_antonyms(harmful_word) if harmful_word else []
         if antonyms:
-            chosen_antonym = choose_best_antonym_in_context(new_prompt, word, antonyms) # use the incrementally updated prompt for context
+            chosen_antonym = choose_best_antonym_in_context(harmful_prompt, harmful_word, antonyms)
         else:
             chosen_antonym = None
         antonyms_list.append(chosen_antonym)
-        if chosen_antonym:
-            new_prompt = substitute_word(new_prompt, word, chosen_antonym)
+    # build the new prompt: substitute with antonym if available, else remove word
+    new_prompt = harmful_prompt
+    for harmful_word, antonym_word in zip(top_harmful_words, antonyms_list):
+        if antonym_word:
+            new_prompt = substitute_word(new_prompt, harmful_word, antonym_word)
         else:
-            new_prompt = remove_word(new_prompt, word)
+            new_prompt = remove_word(new_prompt, harmful_word)
     antonym_prompt = new_prompt
     antonym_score = model_predict_fn(antonym_prompt)
     antonym_pred = "malicious" if antonym_score >= 0.5 else "benign"
