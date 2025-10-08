@@ -39,3 +39,9 @@ embeddings_custom_dataset
 env.yaml
 embeddings_extraction.py
 
+LorentzMLR/classification_results/*
+LorentzMLR/classification_results/*.json
+PROMPT_FILTERING/test_notebooks/.cache/*
+COMPOSITIONAL_ATTACK/selective-amnesia/*
+LorentzMLR/logs/*.log
+COMPOSITIONAL_ATTACK/*.zip

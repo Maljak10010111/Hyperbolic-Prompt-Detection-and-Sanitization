@@ -1,0 +1,66 @@
+import torch
+import torch.nn as nn
+from .LorentzManifold import LorentzManifold
+
+
+class LorentzFullyConnected(nn.Module):
+    """ Lorentz Fully Connected layer aware of manifold. """
+
+    def __init__(
+        self,
+        manifold: LorentzManifold,
+        in_features,
+        out_features,
+        bias=False,
+    ):
+        super(LorentzFullyConnected, self).__init__()
+        self.manifold = manifold
+        self.in_features = in_features
+        self.out_features = out_features
+
+        self.linear = nn.Linear(in_features, out_features, bias=bias)  # euclidean FC for tangent space
+        self.reset_parameters()
+
+    def forward(self, x):
+        tangent_vec = self.manifold.logmap0(x)  # projecting input to tangent space at origin
+
+        tangent_space = tangent_vec[..., 1:]  # remove tangent "time", taking only spatial components of the vector
+        tangent_transformed = self.linear(tangent_space) # applying FC only on spatial components
+
+        tangent_full = torch.cat([torch.zeros_like(tangent_transformed[..., :1]), tangent_transformed], dim=-1) # reconstructing tangent vector with 0 time component (origin)
+
+        output = self.manifold.expmap0(tangent_full) # mapping back to manifold at origin
+
+        return self.manifold.projx(output) # re-normalizes the point back to the manifold
+
+    def reset_parameters(self):
+        nn.init.xavier_uniform_(self.linear.weight)
+        if self.linear.bias is not None:
+            nn.init.constant_(self.linear.bias, 0)
+
+
+class LorentzFullyConnectedNoTime(nn.Module):
+    """ Applies a manifold-aware FC layer to spatial components after mapping from Lorentz space. """
+
+    def __init__(self, manifold, in_features, out_features, bias=False):
+        super().__init__()
+        self.manifold = manifold
+        self.linear = nn.Linear(in_features, out_features, bias=bias)
+
+        nn.init.xavier_uniform_(self.linear.weight)
+        if self.linear.bias is not None:
+            nn.init.constant_(self.linear.bias, 0)
+
+    def forward(self, x):
+        """
+        x: [batch_size, in_features] -- on Lorentz manifold (includes time dim)
+        returns: [batch_size, out_features] -- logits or Euclidean projections
+        """
+
+        tangent_vec = self.manifold.logmap0(x)  # projecting back to tangent space at origin
+
+        tangent_space = tangent_vec[..., 1:]  # removing the time dim and taking spatial components only
+
+        out = self.linear(tangent_space)
+
+        return out
