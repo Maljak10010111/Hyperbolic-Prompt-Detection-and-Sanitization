@@ -12,7 +12,7 @@ sys.path.append(os.path.abspath(
 ))
 
 from HySAC.hysac.models import HySAC
-from HyperbolicSVDD.SVDD_th import LorentzHyperbolicOriginSVDD, project_to_lorentz
+from HyperbolicSVDD.notebooks.SVDD_th import LorentzHyperbolicOriginSVDD, project_to_lorentz
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
