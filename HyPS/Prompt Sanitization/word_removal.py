@@ -22,7 +22,7 @@ sys.path.append(os.path.abspath(
 ))
 
 from HySAC.hysac.models import HySAC
-from HyperbolicSVDD.SVDD_th import LorentzHyperbolicOriginSVDD, project_to_lorentz
+from HyperbolicSVDD.notebooks.SVDD_th import LorentzHyperbolicOriginSVDD, project_to_lorentz
 
 
 os.environ["HF_HOME"] = "/leonardo_scratch/large/userexternal/imaljkov/Diffusion-Models-Embedding-Space-Defense/.cache/huggingface"

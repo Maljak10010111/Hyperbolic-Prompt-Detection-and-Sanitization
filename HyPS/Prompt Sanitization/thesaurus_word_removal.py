@@ -26,7 +26,7 @@ sys.path.append(os.path.abspath(
 ))
 
 from HySAC.hysac.models import HySAC
-from HyperbolicSVDD.SVDD_th import LorentzHyperbolicOriginSVDD, project_to_lorentz
+from HyperbolicSVDD.notebooks.SVDD_th import LorentzHyperbolicOriginSVDD, project_to_lorentz
 
 
 MERRIAM_WEBSTER_API_KEY = "10cc0688-e590-4b23-b41e-930b84406801"
