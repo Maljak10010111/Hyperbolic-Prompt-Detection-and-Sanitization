@@ -7,10 +7,6 @@ This repository contains code for the paper "Harnessing Hyperbolic Geometry for 
 ![Image](teaser_figure.jpg)
 
 
-# Diffusion-Models-Embedding-Space-Defense
-
-This repository, **Diffusion-Models-Embedding-Space-Defense**, is designed for research and experimentation in the defense of embedding spaces using diffusion models. It primarily uses Jupyter Notebooks as its main development and prototyping environment.
-
 
 ## Getting Started
 
@@ -40,8 +36,6 @@ This repository, **Diffusion-Models-Embedding-Space-Defense**, is designed for r
 
 To run HyPE inference please use HyPE_inference.py script that is a minimal example of how to use the HyPE model for harmful prompt detection.
 
-Open the Jupyter Notebooks in the root or appropriate subfolders to explore the experiments, run analyses, or adapt the codebase for your own embedding space defense problems.
-
 
 ## License
 
@@ -49,4 +43,6 @@ This project does not currently specify a license. Please contact the repository
 
 ## Contact
 
-For questions or collaboration, visit the [GitHub profile](https://github.com/Maljak10010111) of the repository owner.
+For questions or collaboration, visit some of these two repositories: 
+1. Igor [GitHub profile](https://github.com/Maljak10010111)
+2. Maria [GitHub profile](https://github.com/Merybria99)
