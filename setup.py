@@ -5,9 +5,6 @@ setup(
     packages=find_packages(),  # This will find all packages
     include_package_data=True,
     install_requires=[
-        # List dependencies here, for example:
-        # "torch>=1.12.0",
-        # "numpy>=1.21.0"
     ],
     python_requires='>=3.7',
     classifiers=[
