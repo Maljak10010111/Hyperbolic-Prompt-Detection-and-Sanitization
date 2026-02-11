@@ -2,7 +2,7 @@
 import math
 import torch
 from torch import Tensor
-from HyperbolicSVDD.notebooks.SVDD import *
+from HyperbolicSVDD.source.SVDD import *
 
 import os
 import pandas as pd
